@@ -29,22 +29,17 @@ function categorize(name: string): string {
 const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) })).filter(s => s.name);
 const GITHUB_BASE = 'https://raw.githubusercontent.com/garrytan/gstack/main';
 
-function corsHeaders(auth?: string) {
-  const headers = {
+function corsHeaders() {
+  return {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
-  if (auth) headers["Access-Control-Expose-Headers"] = auth;
-  return headers;
 }
 
-function authenticate(request: Request): { authenticated: boolean; error?: string } {
+function authenticate(request: Request, apiKey: string): { authenticated: boolean; error?: string } {
   const auth = request.headers.get("Authorization");
   if (!auth) return { authenticated: false, error: "Missing Authorization header" };
-  
-  // Support both Bearer token and Basic auth
-  const apiKey = env.GSTACK_API_KEY;
   if (auth === `Bearer ${apiKey}` || auth === `Basic ${btoa(apiKey)}`) {
     return { authenticated: true };
   }
@@ -55,20 +50,19 @@ export default {
   async fetch(request: Request, env: { GSTACK_API_KEY: string }): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
+    const apiKey = env.GSTACK_API_KEY;
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders() });
     }
 
-    // Public endpoints (no auth required)
+    // Public endpoints
     if (path === "/" || path === "/index.html") {
-      return new Response(generateHTML(), {
-        headers: { ...corsHeaders(), "Content-Type": "text/html" },
-      });
+      return new Response(generateHTML(), { headers: { ...corsHeaders(), "Content-Type": "text/html" } });
     }
 
     // Auth required for API
-    const authResult = authenticate(request);
+    const authResult = authenticate(request, apiKey);
     if (!authResult.authenticated) {
       return new Response(JSON.stringify({ error: authResult.error, requiresAuth: true }), {
         status: 401,
