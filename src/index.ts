@@ -14,7 +14,7 @@ const CATEGORIES: Record<string, string[]> = {
   plan: ['office-hours', 'plan-ceo-review', 'plan-eng-review', 'plan-design-review', 'plan-devex-review', 'plan-tune', 'autoplan', 'design-consultation', 'spec'],
   implement: ['review', 'codex', 'investigate', 'design-review', 'design-shotgun', 'design-html', 'devex-review', 'ship', 'land-and-deploy', 'canary', 'benchmark', 'browse', 'diagram', 'make-pdf', 'skillify', 'scrape'],
   qa: ['qa', 'qa-only', 'ios-qa', 'ios-clean', 'ios-fix', 'ios-design-review', 'ios-sync'],
-  security: ['cso', 'guard', 'freeze', 'unfreeze', 'careful', 'issue-guard'],
+  security: ['cso', 'guard', 'freeze', 'unfreeze', 'careful'],
   docs: ['document-release', 'document-generate', 'learn', 'health', 'retro'],
   ops: ['gstack-upgrade', 'gstack', 'openclaw', 'open-gstack-browser', 'pair-agent', 'patches', 'sync-gbrain', 'setup-gbrain', 'context-save', 'context-restore', 'supabase', 'setup-deploy', 'setup-browser-cookies'],
 };
@@ -40,13 +40,34 @@ function corsHeaders() {
 export default {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
+    const path = url.pathname;
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders() });
     }
 
-    // GET /api/skills - List all (metadata only)
-    if (url.pathname === "/api/skills" || url.pathname === "/api/skills.json") {
+    // GET /api/search
+    if (path === "/api/search") {
+      const q = url.searchParams.get("q");
+      if (!q) {
+        return new Response(JSON.stringify({ error: "Missing 'q' parameter" }), {
+          status: 400,
+          headers: { ...corsHeaders(), "Content-Type": "application/json" },
+        });
+      }
+      const query = q.toLowerCase();
+      const results = SKILLS.filter(s => 
+        s.name.toLowerCase().includes(query) || 
+        s.description?.toLowerCase().includes(query) ||
+        (s.triggers && s.triggers.some(t => t.toLowerCase().includes(query)))
+      );
+      return new Response(JSON.stringify({ query, results, count: results.length }, null, 2), {
+        headers: { ...corsHeaders(), "Content-Type": "application/json" },
+      });
+    }
+
+    // GET /api/skills
+    if (path === "/api/skills" || path === "/api/skills.json") {
       const category = url.searchParams.get("category");
       const search = url.searchParams.get("search");
       let skills = category ? SKILLS.filter(s => s.category === category) : SKILLS;
@@ -54,7 +75,7 @@ export default {
         const q = search.toLowerCase();
         skills = skills.filter(s => 
           s.name.toLowerCase().includes(q) || 
-          s.description.toLowerCase().includes(q) ||
+          s.description?.toLowerCase().includes(q) ||
           (s.triggers && s.triggers.some(t => t.toLowerCase().includes(q)))
         );
       }
@@ -64,8 +85,8 @@ export default {
       });
     }
 
-    // GET /api/skills/:name - Get full skill from GitHub
-    const skillMatch = url.pathname.match(/^\/api\/skills\/(.+)$/);
+    // GET /api/skills/:name
+    const skillMatch = path.match(/^\/api\/skills\/(.+)$/);
     if (skillMatch) {
       const name = decodeURIComponent(skillMatch[1]);
       const skill = SKILLS.find(s => s.name === name);
@@ -75,25 +96,20 @@ export default {
           headers: { ...corsHeaders(), "Content-Type": "application/json" },
         });
       }
-      
-      // Fetch from GitHub
       try {
         const resp = await fetch(`${GITHUB_BASE}/${skill.path}/SKILL.md`);
         if (!resp.ok) throw new Error('Not found');
         const body = await resp.text();
         return new Response(JSON.stringify({ 
-          name, 
-          path: skill.path, 
-          category: skill.category,
-          body 
+          name, path: skill.path, category: skill.category,
+          description: skill.description, version: skill.version,
+          triggers: skill.triggers, allowedTools: skill.allowedTools,
+          body, bodyLength: body.length
         }, null, 2), {
           headers: { ...corsHeaders(), "Content-Type": "application/json" },
         });
       } catch (e) {
-        return new Response(JSON.stringify({ 
-          error: 'Failed to fetch skill content',
-          meta: { name, path: skill.path, category: skill.category }
-        }), {
+        return new Response(JSON.stringify({ error: 'Failed to fetch', meta: { name, path: skill.path } }), {
           status: 502,
           headers: { ...corsHeaders(), "Content-Type": "application/json" },
         });
@@ -101,23 +117,10 @@ export default {
     }
 
     // GET /api/categories
-    if (url.pathname === "/api/categories") {
-      const categories = [...new Set(SKILLS.map(s => s.category))].sort();
-      const counts = Object.fromEntries(categories.map(c => [c, SKILLS.filter(s => s.category === c).length]));
-      return new Response(JSON.stringify({ categories, counts }, null, 2), {
-        headers: { ...corsHeaders(), "Content-Type": "application/json" },
-      });
-    }
-
-    // GET /api/search - Full-text search
-    if (url.pathname === "/api/search") {
-      const q = url.searchParams.get("q") || "";
-      const results = SKILLS.filter(s => 
-        s.name.toLowerCase().includes(q.toLowerCase()) || 
-        s.description.toLowerCase().includes(q.toLowerCase()) ||
-        (s.triggers && s.triggers.some(t => t.toLowerCase().includes(q.toLowerCase())))
-      );
-      return new Response(JSON.stringify({ query: q, results, count: results.length }, null, 2), {
+    if (path === "/api/categories") {
+      const cats = [...new Set(SKILLS.map(s => s.category))].sort();
+      const counts = cats.map(c => ({ category: c, count: SKILLS.filter(s => s.category === c).length }));
+      return new Response(JSON.stringify({ categories: counts }, null, 2), {
         headers: { ...corsHeaders(), "Content-Type": "application/json" },
       });
     }
@@ -134,19 +137,16 @@ function generateHTML() {
     plan: '#58a6ff', implement: '#3fb950', qa: '#d29922',
     security: '#f85149', docs: '#bc8cff', ops: '#f778ba', other: '#8b949e'
   };
-
   const skillsHtml = SKILLS.map(s => `
-    <div class="skill-card" data-cat="${s.category}" data-name="${s.name}">
+    <div class="skill-card" data-cat="${s.category}">
       <div class="skill-name">/${s.name}</div>
       <div class="skill-desc">${s.description || 'No description'}</div>
       <div class="skill-meta">
-        ${s.triggers && s.triggers.length > 0 ? `<div class="triggers">Triggers: ${s.triggers.slice(0, 5).join(', ')}${s.triggers.length > 5 ? '...' : ''}</div>` : ''}
-        ${s.allowedTools && s.allowedTools.length > 0 ? `<div class="tools">Tools: ${s.allowedTools.join(', ')}</div>` : ''}
-        ${s.version ? `<div class="version">v${s.version}</div>` : ''}
+        ${s.triggers?.length ? `<div class="triggers">Triggers: ${s.triggers.slice(0,5).join(', ')}${s.triggers.length > 5 ? '...' : ''}</div>` : ''}
+        ${s.allowedTools?.length ? `<div class="tools">Tools: ${s.allowedTools.join(', ')}</div>` : ''}
       </div>
     </div>
   `).join("");
-
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -176,7 +176,6 @@ function generateHTML() {
     .skill-meta { font-size: 0.75rem; color: #6e7681; }
     .triggers { color: #79c0ff; }
     .tools { color: #3fb950; }
-    .version { color: #8b949e; }
     .hidden { display: none; }
   </style>
 </head>
@@ -194,12 +193,12 @@ function generateHTML() {
     <div class="api-link" style="margin-top:2rem">
       <p><strong>?? API Endpoints:</strong></p>
       <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-        <li><code>GET /api/skills</code> — ${SKILLS.length} skills (metadata)</li>
-        <li><code>GET /api/skills?category=plan</code> — Filter by category</li>
-        <li><code>GET /api/skills?search=design</code> — Search name/desc/triggers</li>
-        <li><code>GET /api/skills/:name</code> — Full markdown from GitHub</li>
-        <li><code>GET /api/categories</code> — Category counts</li>
-        <li><code>GET /api/search?q=keyword</code> — Full-text search</li>
+        <li><code>GET /api/skills</code> — ${SKILLS.length} skills</li>
+        <li><code>GET /api/skills?category=plan</code> — Filter</li>
+        <li><code>GET /api/skills?search=design</code> — Search</li>
+        <li><code>GET /api/skills/:name</code> — Full content</li>
+        <li><code>GET /api/categories</code> — Categories</li>
+        <li><code>GET /api/search?q=keyword</code> — Full-text</li>
       </ul>
     </div>
   </div>
