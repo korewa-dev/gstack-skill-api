@@ -26,7 +26,7 @@ function categorize(name: string): string {
   return 'other';
 }
 
-const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) })).filter(s => s.name);
+const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) }));
 const GITHUB_BASE = 'https://raw.githubusercontent.com/garrytan/gstack/main';
 
 function corsHeaders() {
@@ -46,15 +46,9 @@ export default {
       return new Response(null, { headers: corsHeaders() });
     }
 
-    // Fixed route order - search BEFORE skills/:name
     if (path === "/api/search") {
       const q = url.searchParams.get("q");
-      if (!q) {
-        return new Response(JSON.stringify({ error: "Missing q parameter" }), {
-          status: 400,
-          headers: { ...corsHeaders(), "Content-Type": "application/json" },
-        });
-      }
+      if (!q) return new Response(JSON.stringify({ error: "Missing q" }), { status: 400, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
       const query = q.toLowerCase();
       const results = SKILLS.filter(s => 
         s.name.toLowerCase().includes(query) || 
@@ -84,33 +78,18 @@ export default {
       });
     }
 
-    // Skills by name - must be after /api/skills exact match
     if (path.startsWith("/api/skills/")) {
       const name = decodeURIComponent(path.replace("/api/skills/", ""));
       const skill = SKILLS.find(s => s.name === name);
-      if (!skill) {
-        return new Response(JSON.stringify({ error: `Skill "${name}" not found` }), {
-          status: 404,
-          headers: { ...corsHeaders(), "Content-Type": "application/json" },
-        });
-      }
+      if (!skill) return new Response(JSON.stringify({ error: `Not found: ${name}` }), { status: 404, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
       try {
         const resp = await fetch(`${GITHUB_BASE}/${skill.path}/SKILL.md`);
-        if (!resp.ok) throw new Error('Not found');
         const body = await resp.text();
-        return new Response(JSON.stringify({ 
-          name, path: skill.path, category: skill.category,
-          description: skill.description, version: skill.version,
-          triggers: skill.triggers, allowedTools: skill.allowedTools,
-          body, bodyLength: body.length
-        }, null, 2), {
+        return new Response(JSON.stringify({ name, path: skill.path, category: skill.category, description: skill.description, triggers: skill.triggers, allowedTools: skill.allowedTools, body, bodyLength: body.length }, null, 2), {
           headers: { ...corsHeaders(), "Content-Type": "application/json" },
         });
       } catch (e) {
-        return new Response(JSON.stringify({ error: 'Fetch failed', meta: { name } }), {
-          status: 502,
-          headers: { ...corsHeaders(), "Content-Type": "application/json" },
-        });
+        return new Response(JSON.stringify({ error: "Fetch failed", name }), { status: 502, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
       }
     }
 
@@ -122,9 +101,7 @@ export default {
       });
     }
 
-    return new Response(generateHTML(), {
-      headers: { ...corsHeaders(), "Content-Type": "text/html" },
-    });
+    return new Response(generateHTML(), { headers: { ...corsHeaders(), "Content-Type": "text/html" } });
   },
 };
 
@@ -144,20 +121,18 @@ function generateHTML() {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GStack Skills API</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }
+    body { font-family: system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
     h1 { color: #58a6ff; }
     .subtitle { color: #8b949e; margin-bottom: 2rem; }
-    .stats { color: #8b949e; margin-bottom: 1rem; }
     .api-link { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
     .api-link code { color: #79c0ff; }
     .cat-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
     .cat-btn { background: #161b22; border: 1px solid #30363d; color: #c9d1d9; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
-    .cat-btn:hover, .cat-btn.active { background: #1f6feb; border-color: #1f6feb; }
+    .cat-btn:hover, .cat-btn.active { background: #1f6feb; }
     .search-box { width: 100%; padding: 0.75rem; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 2rem; }
     .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
     .skill-card { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; }
@@ -174,7 +149,6 @@ function generateHTML() {
   <div class="container">
     <h1>GStack Skills API</h1>
     <p class="subtitle">${SKILLS.length} skills from Garry Tan's gstack</p>
-    <div class="stats">Categories: ${categories.length}</div>
     <input type="text" class="search-box" placeholder="Search..." onkeyup="search(this.value)">
     <div class="cat-nav">
       <button class="cat-btn active" onclick="filter('all')">ALL</button>
@@ -197,9 +171,7 @@ function generateHTML() {
     function filter(cat) {
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
-      document.querySelectorAll('.skill-card').forEach(c => {
-        c.classList.toggle('hidden', cat !== 'all' && c.dataset.cat !== cat);
-      });
+      document.querySelectorAll('.skill-card').forEach(c => c.classList.toggle('hidden', cat !== 'all' && c.dataset.cat !== cat));
     }
     function search(q) {
       const query = q.toLowerCase();

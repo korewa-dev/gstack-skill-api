@@ -22,19 +22,6 @@
                      ]
     },
     {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "benchmark",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
         "version":  "1.0.0",
         "name":  "benchmark-models",
         "description":  "Cross-model benchmark for gstack skills. (gstack)",
@@ -50,19 +37,6 @@
                          "compare claude gpt gemini",
                          "benchmark skill across models",
                          "which model should I use"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "browser-skills",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -82,19 +56,6 @@
                          "monitor after deploy",
                          "canary check",
                          "watch for errors post-deploy"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "careful",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -248,19 +209,6 @@
                      ]
     },
     {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "design-shotgun",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
         "version":  "1.0.0",
         "name":  "devex-review",
         "description":  "Live developer experience audit. (gstack)",
@@ -279,19 +227,6 @@
                          "live dx audit",
                          "test developer experience",
                          "measure onboarding time"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "diagram",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -341,19 +276,6 @@
                      ]
     },
     {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "freeze",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
         "version":  "1.1.0",
         "name":  "gstack-upgrade",
         "description":  "Upgrade gstack to the latest version.",
@@ -369,19 +291,6 @@
                          "upgrade gstack",
                          "update gstack version",
                          "get latest gstack"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "guard",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -427,71 +336,6 @@
                          "why is this broken",
                          "root cause analysis",
                          "investigate this error"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "ios-clean",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "ios-design-review",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "ios-fix",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "ios-qa",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "ios-sync",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -550,19 +394,6 @@
                          "show learnings",
                          "what have we learned",
                          "manage project learnings"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "make-pdf",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     },
     {
@@ -828,45 +659,6 @@
                      ]
     },
     {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "scrape",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "setup-browser-cookies",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "setup-deploy",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
-                     ]
-    },
-    {
         "version":  "1.0.0",
         "name":  "setup-gbrain",
         "description":  "Set up gbrain for this coding agent: install the CLI, initialize a local PGLite or Supabase brain, register MCP, capture per-remote trust policy. (gstack)",
@@ -974,19 +766,6 @@
                          "refresh gbrain",
                          "reindex repo",
                          "update gbrain"
-                     ]
-    },
-    {
-        "version":  null,
-        "name":  null,
-        "description":  null,
-        "path":  "unfreeze",
-        "allowedTools":  [
-
-                         ],
-        "preambleTier":  null,
-        "triggers":  [
-
                      ]
     }
 ]
