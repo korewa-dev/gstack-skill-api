@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GStack Skills — AI Coding Workflow</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    header { text-align: center; padding: 3rem 0; border-bottom: 1px solid #21262d; margin-bottom: 2rem; }
+    h1 { color: #58a6ff; font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .tagline { color: #8b949e; font-size: 1.1rem; }
+    .stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #58a6ff; }
+    .stat-label { font-size: 0.85rem; color: #8b949e; text-transform: uppercase; }
+    .search-container { max-width: 600px; margin: 0 auto 2rem; }
+    .search-box { width: 100%; padding: 1rem 1.5rem; background: #161b22; border: 1px solid #30363d; border-radius: 12px; color: #c9d1d9; font-size: 1rem; transition: border-color 0.2s; }
+    .search-box:focus { outline: none; border-color: #58a6ff; }
+    .categories { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; }
+    .cat-btn { background: #161b22; border: 1px solid #30363d; color: #c9d1d9; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .cat-btn:hover { border-color: #58a6ff; }
+    .cat-btn.active { background: #1f6feb; border-color: #1f6feb; color: white; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; }
+    .skill-card { background: #161b22; border: 1px solid #30363d; padding: 1.25rem; border-radius: 12px; transition: all 0.2s; cursor: pointer; }
+    .skill-card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+    .skill-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .skill-name { color: #58a6ff; font-weight: 600; font-size: 1.1rem; }
+    .skill-category { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; text-transform: uppercase; }
+    .cat-plan { background: #1f6feb20; color: #58a6ff; }
+    .cat-implement { background: #3fb95020; color: #3fb950; }
+    .cat-qa { background: #d2992220; color: #d29922; }
+    .cat-security { background: #f8514920; color: #f85149; }
+    .cat-docs { background: #bc8cff20; color: #bc8cff; }
+    .cat-ops { background: #f778ba20; color: #f778ba; }
+    .cat-other { background: #8b949e20; color: #8b949e; }
+    .skill-desc { color: #8b949e; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.75rem; }
+    .skill-meta { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem; }
+    .meta-item { color: #6e7681; }
+    .meta-item span { color: #8b949e; }
+    .triggers { color: #79c0ff; }
+    .tools { color: #3fb950; }
+    .empty-state { text-align: center; padding: 4rem 2rem; color: #8b949e; }
+    footer { text-align: center; padding: 2rem; color: #6e7681; font-size: 0.85rem; border-top: 1px solid #21262d; margin-top: 3rem; }
+    footer a { color: #58a6ff; text-decoration: none; }
+    .loading { text-align: center; padding: 2rem; color: #8b949e; }
+    .logout { position: fixed; top: 1rem; right: 1rem; background: #161b22; border: 1px solid #30363d; color: #c9d1d9; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+    .logout:hover { border-color: #f85149; color: #f85149; }
+  </style>
+</head>
+<body>
+  <button class="logout" onclick="logout()">Logout</button>
+  <div class="container">
+    <header>
+      <h1>GStack Skills</h1>
+      <p class="tagline">Garry Tan's AI coding workflow &mdash; 37 methodology skills</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="totalSkills">&mdash;</div>
+          <div class="stat-label">Skills</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="totalCategories">&mdash;</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">API</div>
+          <div class="stat-label">Live</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="search-container">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search skills, triggers, descriptions..." autocomplete="off">
+    </div>
+
+    <div class="categories" id="categories"></div>
+
+    <div class="skills-grid" id="skillsGrid">
+      <div class="loading">Loading skills...</div>
+    </div>
+
+    <footer>
+      <p>Powered by <a href="https://github.com/garrytan/gstack" target="_blank">gstack</a> &middot; API by <a href="https://github.com/korewa-dev/gstack-skill-api" target="_blank">korewa-dev</a></p>
+      <p style="margin-top: 0.5rem;"><a href="https://gstack-skill-api.beerman.workers.dev/api/skills" target="_blank">API Documentation</a></p>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = 'https://gstack-skill-api.beerman.workers.dev';
+    const STORAGE_KEY = 'gstack_api_key';
+    let allSkills = [];
+    let activeCategory = 'all';
+    let apiKey = '';
+
+    // Get API key from URL or storage
+    const urlParams = new URLSearchParams(window.location.search);
+    apiKey = urlParams.get('key') || localStorage.getItem(STORAGE_KEY);
+    
+    if (!apiKey) {
+      window.location.href = '/';
+    }
+
+    async function loadSkills() {
+      try {
+        const resp = await fetch(`${API_BASE}/api/skills`, {
+          headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+        if (!resp.ok) throw new Error('Unauthorized');
+        const data = await resp.json();
+        allSkills = data.skills;
+        document.getElementById('totalSkills').textContent = data.total;
+        renderCategories();
+        renderSkills();
+      } catch (e) {
+        document.getElementById('skillsGrid').innerHTML = '<div class="empty-state">Authentication failed. <a href="/" style="color:#58a6ff">Login again</a></div>';
+      }
+    }
+
+    function renderCategories() {
+      const cats = [...new Set(allSkills.map(s => s.category))].sort();
+      document.getElementById('totalCategories').textContent = cats.length;
+      const container = document.getElementById('categories');
+      container.innerHTML = `
+        <button class="cat-btn ${activeCategory === 'all' ? 'active' : ''}" onclick="filterCat('all')">All (${allSkills.length})</button>
+        ${cats.map(c => `<button class="cat-btn ${activeCategory === c ? 'active' : ''}" onclick="filterCat('${c}')">${c.toUpperCase()} (${allSkills.filter(s => s.category === c).length})</button>`).join('')}
+      `;
+    }
+
+    function renderSkills(filter = '') {
+      const query = filter.toLowerCase();
+      let skills = activeCategory === 'all' ? allSkills : allSkills.filter(s => s.category === activeCategory);
+      if (query) {
+        skills = skills.filter(s => 
+          s.name.toLowerCase().includes(query) ||
+          (s.description && s.description.toLowerCase().includes(query)) ||
+          (s.triggers && s.triggers.some(t => t.toLowerCase().includes(query)))
+        );
+      }
+      const container = document.getElementById('skillsGrid');
+      if (skills.length === 0) {
+        container.innerHTML = '<div class="empty-state">No skills found</div>';
+        return;
+      }
+      container.innerHTML = skills.map(s => `
+        <div class="skill-card" onclick="showSkill('${s.name}')">
+          <div class="skill-header">
+            <span class="skill-name">/${s.name}</span>
+            <span class="skill-category cat-${s.category}">${s.category}</span>
+          </div>
+          <div class="skill-desc">${s.description || 'No description'}</div>
+          <div class="skill-meta">
+            ${s.triggers?.length ? `<div class="meta-item triggers"><span>Triggers:</span> ${s.triggers.slice(0, 3).join(', ')}${s.triggers.length > 3 ? '...' : ''}</div>` : ''}
+            ${s.allowedTools?.length ? `<div class="meta-item tools"><span>Tools:</span> ${s.allowedTools.join(', ')}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCat(cat) {
+      activeCategory = cat;
+      renderCategories();
+      renderSkills(document.getElementById('searchBox').value);
+    }
+
+    function showSkill(name) {
+      window.open(`${API_BASE}/api/skills/${name}?key=${encodeURIComponent(apiKey)}`, '_blank');
+    }
+
+    function logout() {
+      localStorage.removeItem(STORAGE_KEY);
+      window.location.href = '/';
+    }
+
+    document.getElementById('searchBox').addEventListener('input', (e) => {
+      renderSkills(e.target.value);
+    });
+
+    loadSkills();
+  </script>
+</body>
+</html>

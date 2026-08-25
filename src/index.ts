@@ -26,19 +26,33 @@ function categorize(name: string): string {
   return 'other';
 }
 
-const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) }));
+const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) })).filter(s => s.name);
 const GITHUB_BASE = 'https://raw.githubusercontent.com/garrytan/gstack/main';
 
-function corsHeaders() {
-  return {
+function corsHeaders(auth?: string) {
+  const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
+  if (auth) headers["Access-Control-Expose-Headers"] = auth;
+  return headers;
+}
+
+function authenticate(request: Request): { authenticated: boolean; error?: string } {
+  const auth = request.headers.get("Authorization");
+  if (!auth) return { authenticated: false, error: "Missing Authorization header" };
+  
+  // Support both Bearer token and Basic auth
+  const apiKey = env.GSTACK_API_KEY;
+  if (auth === `Bearer ${apiKey}` || auth === `Basic ${btoa(apiKey)}`) {
+    return { authenticated: true };
+  }
+  return { authenticated: false, error: "Invalid API key" };
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: { GSTACK_API_KEY: string }): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -46,16 +60,18 @@ export default {
       return new Response(null, { headers: corsHeaders() });
     }
 
-    if (path === "/api/search") {
-      const q = url.searchParams.get("q");
-      if (!q) return new Response(JSON.stringify({ error: "Missing q" }), { status: 400, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
-      const query = q.toLowerCase();
-      const results = SKILLS.filter(s => 
-        s.name.toLowerCase().includes(query) || 
-        (s.description && s.description.toLowerCase().includes(query)) ||
-        (s.triggers && s.triggers.some(t => t.toLowerCase().includes(query)))
-      );
-      return new Response(JSON.stringify({ query, results, count: results.length }, null, 2), {
+    // Public endpoints (no auth required)
+    if (path === "/" || path === "/index.html") {
+      return new Response(generateHTML(), {
+        headers: { ...corsHeaders(), "Content-Type": "text/html" },
+      });
+    }
+
+    // Auth required for API
+    const authResult = authenticate(request);
+    if (!authResult.authenticated) {
+      return new Response(JSON.stringify({ error: authResult.error, requiresAuth: true }), {
+        status: 401,
         headers: { ...corsHeaders(), "Content-Type": "application/json" },
       });
     }
@@ -81,7 +97,7 @@ export default {
     if (path.startsWith("/api/skills/")) {
       const name = decodeURIComponent(path.replace("/api/skills/", ""));
       const skill = SKILLS.find(s => s.name === name);
-      if (!skill) return new Response(JSON.stringify({ error: `Not found: ${name}` }), { status: 404, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
+      if (!skill) return new Response(JSON.stringify({ error: `Skill "${name}" not found` }), { status: 404, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
       try {
         const resp = await fetch(`${GITHUB_BASE}/${skill.path}/SKILL.md`);
         const body = await resp.text();
@@ -101,87 +117,46 @@ export default {
       });
     }
 
-    return new Response(generateHTML(), { headers: { ...corsHeaders(), "Content-Type": "text/html" } });
+    if (path === "/api/search") {
+      const q = url.searchParams.get("q");
+      if (!q) return new Response(JSON.stringify({ error: "Missing q" }), { status: 400, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
+      const query = q.toLowerCase();
+      const results = SKILLS.filter(s => 
+        s.name.toLowerCase().includes(query) || 
+        (s.description && s.description.toLowerCase().includes(query)) ||
+        (s.triggers && s.triggers.some(t => t.toLowerCase().includes(query)))
+      );
+      return new Response(JSON.stringify({ query, results, count: results.length }, null, 2), {
+        headers: { ...corsHeaders(), "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Not found" }), { status: 404, headers: { ...corsHeaders(), "Content-Type": "application/json" } });
   },
 };
 
 function generateHTML() {
-  const categories = [...new Set(SKILLS.map(s => s.category))].sort();
-  const skillsHtml = SKILLS.map(s => `
-    <div class="skill-card" data-cat="${s.category}">
-      <div class="skill-name">/${s.name}</div>
-      <div class="skill-desc">${s.description || 'No description'}</div>
-      <div class="skill-meta">
-        ${s.triggers?.length ? `<div class="triggers">Triggers: ${s.triggers.slice(0,5).join(', ')}</div>` : ''}
-        ${s.allowedTools?.length ? `<div class="tools">Tools: ${s.allowedTools.join(', ')}</div>` : ''}
-      </div>
-    </div>
-  `).join("");
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GStack Skills API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GStack Skills â€” Auth Required</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    h1 { color: #58a6ff; }
-    .subtitle { color: #8b949e; margin-bottom: 2rem; }
-    .api-link { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
-    .api-link code { color: #79c0ff; }
-    .cat-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
-    .cat-btn { background: #161b22; border: 1px solid #30363d; color: #c9d1d9; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
-    .cat-btn:hover, .cat-btn.active { background: #1f6feb; }
-    .search-box { width: 100%; padding: 0.75rem; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #c9d1d9; margin-bottom: 2rem; }
-    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
-    .skill-card { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; }
-    .skill-card:hover { border-color: #58a6ff; }
-    .skill-name { color: #58a6ff; font-weight: 600; }
-    .skill-desc { color: #8b949e; font-size: 0.9rem; margin: 0.5rem 0; }
-    .skill-meta { font-size: 0.75rem; color: #6e7681; }
-    .triggers { color: #79c0ff; }
-    .tools { color: #3fb950; }
-    .hidden { display: none; }
+    body { font-family: system-ui, sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { text-align: center; padding: 2rem; }
+    h1 { color: #58a6ff; margin-bottom: 1rem; }
+    p { color: #8b949e; margin-bottom: 2rem; }
+    .api-key { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; font-family: monospace; color: #79c0ff; word-break: break-all; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>GStack Skills API</h1>
-    <p class="subtitle">${SKILLS.length} skills from Garry Tan's gstack</p>
-    <input type="text" class="search-box" placeholder="Search..." onkeyup="search(this.value)">
-    <div class="cat-nav">
-      <button class="cat-btn active" onclick="filter('all')">ALL</button>
-      ${categories.map(c => `<button class="cat-btn" onclick="filter('${c}')">${c.toUpperCase()}</button>`).join('')}
-    </div>
-    <div class="skills-grid">${skillsHtml}</div>
-    <div class="api-link" style="margin-top:2rem">
-      <p><strong>API:</strong></p>
-      <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
-        <li><code>GET /api/skills</code> — All skills</li>
-        <li><code>GET /api/skills?category=plan</code> — Filter</li>
-        <li><code>GET /api/skills?search=design</code> — Search</li>
-        <li><code>GET /api/skills/:name</code> — Full content</li>
-        <li><code>GET /api/categories</code> — Categories</li>
-        <li><code>GET /api/search?q=keyword</code> — Full-text</li>
-      </ul>
-    </div>
+    <p>This API requires authentication. Provide your API key via the Authorization header:</p>
+    <div class="api-key">Authorization: Bearer &lt;your-api-key&gt;</div>
   </div>
-  <script>
-    function filter(cat) {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      document.querySelectorAll('.skill-card').forEach(c => c.classList.toggle('hidden', cat !== 'all' && c.dataset.cat !== cat));
-    }
-    function search(q) {
-      const query = q.toLowerCase();
-      document.querySelectorAll('.skill-card').forEach(c => {
-        const name = c.querySelector('.skill-name').textContent.toLowerCase();
-        const desc = c.querySelector('.skill-desc').textContent.toLowerCase();
-        c.classList.toggle('hidden', !name.includes(query) && !desc.includes(query));
-      });
-    }
-  </script>
 </body>
 </html>`;
 }
