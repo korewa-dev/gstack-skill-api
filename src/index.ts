@@ -1,12 +1,15 @@
 import skillsData from './skills-data.json' assert { type: 'json' };
 
-interface SkillInfo {
+interface SkillMeta {
   name: string;
   description: string;
-  category: string;
+  version?: string;
+  preambleTier?: string;
+  triggers?: string[];
+  allowedTools?: string[];
+  path: string;
 }
 
-// Categorize skills
 const CATEGORIES: Record<string, string[]> = {
   plan: ['office-hours', 'plan-ceo-review', 'plan-eng-review', 'plan-design-review', 'plan-devex-review', 'plan-tune', 'autoplan', 'design-consultation', 'spec'],
   implement: ['review', 'codex', 'investigate', 'design-review', 'design-shotgun', 'design-html', 'devex-review', 'ship', 'land-and-deploy', 'canary', 'benchmark', 'browse', 'diagram', 'make-pdf', 'skillify', 'scrape'],
@@ -23,10 +26,8 @@ function categorize(name: string): string {
   return 'other';
 }
 
-const SKILLS: SkillInfo[] = skillsData.map((s: { name: string; description: string }) => ({
-  ...s,
-  category: categorize(s.name),
-}));
+const SKILLS: (SkillMeta & { category: string })[] = skillsData.map(s => ({ ...s, category: categorize(s.name) }));
+const GITHUB_BASE = 'https://raw.githubusercontent.com/garrytan/gstack/main';
 
 function corsHeaders() {
   return {
@@ -44,19 +45,62 @@ export default {
       return new Response(null, { headers: corsHeaders() });
     }
 
+    // GET /api/skills - List all (metadata only)
     if (url.pathname === "/api/skills" || url.pathname === "/api/skills.json") {
       const category = url.searchParams.get("category");
       const search = url.searchParams.get("search");
       let skills = category ? SKILLS.filter(s => s.category === category) : SKILLS;
       if (search) {
         const q = search.toLowerCase();
-        skills = skills.filter(s => s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q));
+        skills = skills.filter(s => 
+          s.name.toLowerCase().includes(q) || 
+          s.description.toLowerCase().includes(q) ||
+          (s.triggers && s.triggers.some(t => t.toLowerCase().includes(q)))
+        );
       }
-      return new Response(JSON.stringify({ skills, count: skills.length }, null, 2), {
+      const result = skills.map(({ path, ...rest }) => rest);
+      return new Response(JSON.stringify({ skills: result, count: result.length, total: SKILLS.length }, null, 2), {
         headers: { ...corsHeaders(), "Content-Type": "application/json" },
       });
     }
 
+    // GET /api/skills/:name - Get full skill from GitHub
+    const skillMatch = url.pathname.match(/^\/api\/skills\/(.+)$/);
+    if (skillMatch) {
+      const name = decodeURIComponent(skillMatch[1]);
+      const skill = SKILLS.find(s => s.name === name);
+      if (!skill) {
+        return new Response(JSON.stringify({ error: `Skill "${name}" not found` }), {
+          status: 404,
+          headers: { ...corsHeaders(), "Content-Type": "application/json" },
+        });
+      }
+      
+      // Fetch from GitHub
+      try {
+        const resp = await fetch(`${GITHUB_BASE}/${skill.path}/SKILL.md`);
+        if (!resp.ok) throw new Error('Not found');
+        const body = await resp.text();
+        return new Response(JSON.stringify({ 
+          name, 
+          path: skill.path, 
+          category: skill.category,
+          body 
+        }, null, 2), {
+          headers: { ...corsHeaders(), "Content-Type": "application/json" },
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ 
+          error: 'Failed to fetch skill content',
+          meta: { name, path: skill.path, category: skill.category }
+        }), {
+          status: 502,
+          headers: { ...corsHeaders(), "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // GET /api/categories
     if (url.pathname === "/api/categories") {
       const categories = [...new Set(SKILLS.map(s => s.category))].sort();
       const counts = Object.fromEntries(categories.map(c => [c, SKILLS.filter(s => s.category === c).length]));
@@ -65,12 +109,13 @@ export default {
       });
     }
 
-    // Grep/search endpoint
+    // GET /api/search - Full-text search
     if (url.pathname === "/api/search") {
       const q = url.searchParams.get("q") || "";
       const results = SKILLS.filter(s => 
         s.name.toLowerCase().includes(q.toLowerCase()) || 
-        s.description.toLowerCase().includes(q.toLowerCase())
+        s.description.toLowerCase().includes(q.toLowerCase()) ||
+        (s.triggers && s.triggers.some(t => t.toLowerCase().includes(q.toLowerCase())))
       );
       return new Response(JSON.stringify({ query: q, results, count: results.length }, null, 2), {
         headers: { ...corsHeaders(), "Content-Type": "application/json" },
@@ -90,20 +135,17 @@ function generateHTML() {
     security: '#f85149', docs: '#bc8cff', ops: '#f778ba', other: '#8b949e'
   };
 
-  const categoryNav = categories.map(c => `
-    <button class="cat-btn active" data-cat="${c}" onclick="filterCat('${c}')">${c.toUpperCase()} (${SKILLS.filter(s => s.category === c).length})</button>
-  `).join("");
-
-  const skillsByCat = categories.map(cat => {
-    const skills = SKILLS.filter(s => s.category === cat);
-    const cards = skills.map(s => `
-      <div class="skill-card" data-cat="${s.category}">
-        <div class="skill-name">/${s.name}</div>
-        <div class="skill-desc">${s.description || 'No description'}</div>
+  const skillsHtml = SKILLS.map(s => `
+    <div class="skill-card" data-cat="${s.category}" data-name="${s.name}">
+      <div class="skill-name">/${s.name}</div>
+      <div class="skill-desc">${s.description || 'No description'}</div>
+      <div class="skill-meta">
+        ${s.triggers && s.triggers.length > 0 ? `<div class="triggers">Triggers: ${s.triggers.slice(0, 5).join(', ')}${s.triggers.length > 5 ? '...' : ''}</div>` : ''}
+        ${s.allowedTools && s.allowedTools.length > 0 ? `<div class="tools">Tools: ${s.allowedTools.join(', ')}</div>` : ''}
+        ${s.version ? `<div class="version">v${s.version}</div>` : ''}
       </div>
-    `).join("");
-    return `<div class="cat-section" id="cat-${cat}"><h3 style="color:${catColors[cat] || '#8b949e'};margin:1rem 0">${cat.toUpperCase()} (${skills.length})</h3><div class="skills-grid">${cards}</div></div>`;
-  }).join("");
+    </div>
+  `).join("");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -126,12 +168,15 @@ function generateHTML() {
     .cat-btn.active { background: #1f6feb; border-color: #1f6feb; color: white; }
     .search-box { width: 100%; padding: 0.75rem 1rem; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #c9d1d9; font-size: 1rem; margin-bottom: 2rem; }
     .search-box:focus { outline: none; border-color: #58a6ff; }
-    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
     .skill-card { background: #161b22; border: 1px solid #30363d; padding: 1rem; border-radius: 8px; transition: border-color 0.2s; }
     .skill-card:hover { border-color: #58a6ff; }
     .skill-name { color: #58a6ff; font-weight: 600; margin-bottom: 0.5rem; font-size: 1.1rem; }
-    .skill-desc { color: #8b949e; font-size: 0.9rem; }
-    .cat-section { margin-bottom: 2rem; }
+    .skill-desc { color: #8b949e; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .skill-meta { font-size: 0.75rem; color: #6e7681; }
+    .triggers { color: #79c0ff; }
+    .tools { color: #3fb950; }
+    .version { color: #8b949e; }
     .hidden { display: none; }
   </style>
 </head>
@@ -139,38 +184,25 @@ function generateHTML() {
   <div class="container">
     <h1>?? GStack Skills API</h1>
     <p class="subtitle">Garry Tan's AI coding workflow — ${SKILLS.length} skills</p>
-    
-    <div class="stats">
-      <p>Categories: ${[...new Set(SKILLS.map(s => s.category))].length} | Last updated: ${new Date().toISOString().split('T')[0]}</p>
-    </div>
-
-    <input type="text" class="search-box" placeholder="Search skills..." onkeyup="searchSkills(this.value)">
-
+    <div class="stats"><p>Categories: ${categories.length} | Last updated: ${new Date().toISOString().split('T')[0]}</p></div>
+    <input type="text" class="search-box" placeholder="Search skills, triggers..." onkeyup="searchSkills(this.value)">
     <div class="cat-nav">
       <button class="cat-btn active" onclick="filterCat('all')">ALL (${SKILLS.length})</button>
       ${categories.map(c => `<button class="cat-btn" onclick="filterCat('${c}')">${c.toUpperCase()} (${SKILLS.filter(s => s.category === c).length})</button>`).join('')}
     </div>
-    
-    <div class="skills-grid" id="skillsGrid">
-      ${categories.map(cat => {
-        const skills = SKILLS.filter(s => s.category === cat);
-        const cards = skills.map(s => `<div class="skill-card" data-cat="${s.category}"><div class="skill-name">/${s.name}</div><div class="skill-desc">${s.description || 'No description'}</div></div>`).join('');
-        return `<div class="cat-section" id="cat-${cat}">${cards}</div>`;
-      }).join('')}
-    </div>
-
+    <div class="skills-grid">${skillsHtml}</div>
     <div class="api-link" style="margin-top:2rem">
       <p><strong>?? API Endpoints:</strong></p>
       <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-        <li><code>GET /api/skills</code> — All ${SKILLS.length} skills</li>
+        <li><code>GET /api/skills</code> — ${SKILLS.length} skills (metadata)</li>
         <li><code>GET /api/skills?category=plan</code> — Filter by category</li>
-        <li><code>GET /api/skills?search=design</code> — Search skills</li>
+        <li><code>GET /api/skills?search=design</code> — Search name/desc/triggers</li>
+        <li><code>GET /api/skills/:name</code> — Full markdown from GitHub</li>
         <li><code>GET /api/categories</code> — Category counts</li>
-        <li><code>GET /api/skills.json</code> — Raw JSON</li>
+        <li><code>GET /api/search?q=keyword</code> — Full-text search</li>
       </ul>
     </div>
   </div>
-
   <script>
     function filterCat(cat) {
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -184,7 +216,8 @@ function generateHTML() {
       document.querySelectorAll('.skill-card').forEach(c => {
         const name = c.querySelector('.skill-name').textContent.toLowerCase();
         const desc = c.querySelector('.skill-desc').textContent.toLowerCase();
-        c.classList.toggle('hidden', !name.includes(query) && !desc.includes(query));
+        const triggers = c.querySelector('.triggers')?.textContent.toLowerCase() || '';
+        c.classList.toggle('hidden', !name.includes(query) && !desc.includes(query) && !triggers.includes(query));
       });
     }
   </script>

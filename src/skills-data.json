@@ -1,218 +1,992 @@
 ﻿[
     {
+        "version":  "1.0.0",
         "name":  "autoplan",
-        "description":  "Auto-review pipeline â€” reads the full CEO, design, eng, and DX review skills from disk and runs them sequentially with auto-decisions using 6 decision principles. (gstack)"
+        "description":  "Auto-review pipeline â€” reads the full CEO, design, eng, and DX review skills from disk and runs them sequentially with auto-decisions using 6 decision principles. (gstack)",
+        "path":  "autoplan",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "WebSearch",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "run all reviews",
+                         "automatic review pipeline",
+                         "auto plan review"
+                     ]
     },
     {
-        "name":  "benchmark",
-        "description":  "Performance regression detection using the browse daemon. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "benchmark",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "benchmark-models",
-        "description":  "Cross-model benchmark for gstack skills. (gstack)"
+        "description":  "Cross-model benchmark for gstack skills. (gstack)",
+        "path":  "benchmark-models",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "1",
+        "triggers":  [
+                         "cross model benchmark",
+                         "compare claude gpt gemini",
+                         "benchmark skill across models",
+                         "which model should I use"
+                     ]
     },
     {
-        "name":  "hackernews-frontpage",
-        "description":  "Scrape the Hacker News front page (titles, points, comment counts)."
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "browser-skills",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "canary",
-        "description":  "Post-deploy canary monitoring. (gstack)"
+        "description":  "Post-deploy canary monitoring. (gstack)",
+        "path":  "canary",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "monitor after deploy",
+                         "canary check",
+                         "watch for errors post-deploy"
+                     ]
     },
     {
-        "name":  "careful",
-        "description":  "Safety guardrails for destructive commands. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "careful",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "codex",
-        "description":  "OpenAI Codex CLI wrapper â€” three modes. (gstack)"
+        "description":  "OpenAI Codex CLI wrapper â€” three modes. (gstack)",
+        "path":  "codex",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "codex review",
+                         "second opinion",
+                         "outside voice challenge"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "context-restore",
-        "description":  "Restore working context saved earlier by /context-save. (gstack)"
+        "description":  "Restore working context saved earlier by /context-save. (gstack)",
+        "path":  "context-restore",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "resume where i left off",
+                         "restore context",
+                         "where was i",
+                         "pick up where i left off",
+                         "context restore"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "context-save",
-        "description":  "Save working context. (gstack)"
+        "description":  "Save working context. (gstack)",
+        "path":  "context-save",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "save progress",
+                         "save state",
+                         "save my work",
+                         "context save"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "cso",
-        "description":  "Chief Security Officer mode. (gstack)"
+        "description":  "Chief Security Officer mode. (gstack)",
+        "path":  "cso",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Grep",
+                             "Glob",
+                             "Write",
+                             "Agent",
+                             "WebSearch",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "security audit",
+                         "check for vulnerabilities",
+                         "owasp review"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "design-consultation",
-        "description":  "Design consultation: understands your product, researches the landscape, proposes a complete design system (aesthetic, typography, color, layout, spacing, motion), and generates font+color preview... (gstack)"
+        "description":  "Design consultation: understands your product, researches the landscape, proposes a complete design system (aesthetic, typography, color, layout, spacing, motion), and generates font+color preview... (gstack)",
+        "path":  "design-consultation",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "design system",
+                         "create a brand",
+                         "design from scratch"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "design-html",
-        "description":  "Design finalization: generates production-quality Pretext-native HTML/CSS. (gstack)"
+        "description":  "Design finalization: generates production-quality Pretext-native HTML/CSS. (gstack)",
+        "path":  "design-html",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "Agent",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "build the design",
+                         "code the mockup",
+                         "make design real"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "design-review",
-        "description":  "Designer\u0027s eye QA: finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions â€” then fixes them. (gstack)"
+        "description":  "Designer\u0027s eye QA: finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions â€” then fixes them. (gstack)",
+        "path":  "design-review",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "visual design audit",
+                         "design qa",
+                         "fix design issues"
+                     ]
     },
     {
-        "name":  "design-shotgun",
-        "description":  "Design shotgun: generate multiple AI design variants, open a comparison board, collect structured feedback, and iterate. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "design-shotgun",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "devex-review",
-        "description":  "Live developer experience audit. (gstack)"
+        "description":  "Live developer experience audit. (gstack)",
+        "path":  "devex-review",
+        "allowedTools":  [
+                             "Read",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "Bash",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "live dx audit",
+                         "test developer experience",
+                         "measure onboarding time"
+                     ]
     },
     {
-        "name":  "diagram",
-        "description":  "Turn an English description (or mermaid source) into a diagram triplet: the source, an editable .excalidraw file you can open on excalidraw.com, and rendered SVG + PNG. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "diagram",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "document-generate",
-        "description":  "Generate missing documentation from scratch for a feature, module, or entire project. (gstack)"
+        "description":  "Generate missing documentation from scratch for a feature, module, or entire project. (gstack)",
+        "path":  "document-generate",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "write docs for this",
+                         "generate documentation",
+                         "document this feature",
+                         "create a tutorial",
+                         "write a how-to",
+                         "explain this module",
+                         "docs for this project"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "document-release",
-        "description":  "Post-ship documentation update. (gstack)"
+        "description":  "Post-ship documentation update. (gstack)",
+        "path":  "document-release",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "update docs after ship",
+                         "document what changed",
+                         "post-ship docs"
+                     ]
     },
     {
-        "name":  "freeze",
-        "description":  "Restrict file edits to a specific directory for the session. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "freeze",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.1.0",
         "name":  "gstack-upgrade",
-        "description":  "Upgrade gstack to the latest version."
+        "description":  "Upgrade gstack to the latest version.",
+        "path":  "gstack-upgrade",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+                         "upgrade gstack",
+                         "update gstack version",
+                         "get latest gstack"
+                     ]
     },
     {
-        "name":  "guard",
-        "description":  "Full safety mode: destructive command warnings + directory-scoped edits. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "guard",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "health",
-        "description":  "Code quality dashboard. (gstack)"
+        "description":  "Code quality dashboard. (gstack)",
+        "path":  "health",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "code health check",
+                         "quality dashboard",
+                         "how healthy is codebase"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "investigate",
-        "description":  "Systematic debugging with root cause investigation. (gstack)"
+        "description":  "Systematic debugging with root cause investigation. (gstack)",
+        "path":  "investigate",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "debug this",
+                         "fix this bug",
+                         "why is this broken",
+                         "root cause analysis",
+                         "investigate this error"
+                     ]
     },
     {
-        "name":  "ios-clean",
-        "description":  "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "ios-clean",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "ios-design-review",
-        "description":  "Visual design audit for iOS apps on real hardware. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "ios-design-review",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "ios-fix",
-        "description":  "Autonomous iOS bug fixer. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "ios-fix",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "ios-qa",
-        "description":  "Live-device iOS QA for SwiftUI apps. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "ios-qa",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "ios-sync",
-        "description":  "Regenerate the iOS debug bridge against the latest upstream gstack templates. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "ios-sync",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "land-and-deploy",
-        "description":  "Land and deploy workflow. (gstack)"
+        "description":  "Land and deploy workflow. (gstack)",
+        "path":  "land-and-deploy",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "merge and deploy",
+                         "land the pr",
+                         "ship to production"
+                     ]
     },
     {
+        "version":  "0.1.0",
         "name":  "landing-report",
-        "description":  "Read-only queue dashboard for workspace-aware ship. (gstack)"
+        "description":  "Read-only queue dashboard for workspace-aware ship. (gstack)",
+        "path":  "landing-report",
+        "allowedTools":  [
+                             "Bash",
+                             "Read"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "landing report",
+                         "version queue",
+                         "ship queue",
+                         "what version comes next",
+                         "show open PR versions"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "learn",
-        "description":  "Manage project learnings."
+        "description":  "Manage project learnings.",
+        "path":  "learn",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "AskUserQuestion",
+                             "Glob",
+                             "Grep"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "show learnings",
+                         "what have we learned",
+                         "manage project learnings"
+                     ]
     },
     {
-        "name":  "make-pdf",
-        "description":  "Turn any markdown file into a publication-quality PDF. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "make-pdf",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "office-hours",
-        "description":  "YC Office Hours â€” two modes. (gstack)"
+        "description":  "YC Office Hours â€” two modes. (gstack)",
+        "path":  "office-hours",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Grep",
+                             "Glob",
+                             "Write",
+                             "Edit",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "brainstorm this",
+                         "is this worth building",
+                         "help me think through",
+                         "office hours"
+                     ]
     },
     {
+        "version":  "0.2.0",
         "name":  "open-gstack-browser",
-        "description":  "Launch GStack Browser â€” AI-controlled Chromium with the sidebar extension baked in."
+        "description":  "Launch GStack Browser â€” AI-controlled Chromium with the sidebar extension baked in.",
+        "path":  "open-gstack-browser",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "1",
+        "triggers":  [
+                         "open gstack browser",
+                         "launch chromium",
+                         "show me the browser"
+                     ]
     },
     {
+        "version":  null,
         "name":  "gstack-openclaw-ceo-review",
-        "description":  "Use when asked to review a plan, challenge a proposal, run a CEO review, poke holes in an approach, think bigger about scope, or decide whether to expand or reduce the plan."
+        "description":  "Use when asked to review a plan, challenge a proposal, run a CEO review, poke holes in an approach, think bigger about scope, or decide whether to expand or reduce the plan.",
+        "path":  "openclaw",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "0.1.0",
         "name":  "pair-agent",
-        "description":  "Pair a remote AI agent with your browser. (gstack)"
+        "description":  "Pair a remote AI agent with your browser. (gstack)",
+        "path":  "pair-agent",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "pair with agent",
+                         "connect remote agent",
+                         "share my browser"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "plan-ceo-review",
-        "description":  "CEO/founder-mode plan review. (gstack)"
+        "description":  "CEO/founder-mode plan review. (gstack)",
+        "path":  "plan-ceo-review",
+        "allowedTools":  [
+                             "Read",
+                             "Grep",
+                             "Glob",
+                             "Bash",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "think bigger",
+                         "expand scope",
+                         "strategy review",
+                         "rethink this plan"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "plan-design-review",
-        "description":  "Designer\u0027s eye plan review â€” interactive, like CEO and Eng review. (gstack)"
+        "description":  "Designer\u0027s eye plan review â€” interactive, like CEO and Eng review. (gstack)",
+        "path":  "plan-design-review",
+        "allowedTools":  [
+                             "Read",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "Bash",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "design plan review",
+                         "review ux plan",
+                         "check design decisions"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "plan-devex-review",
-        "description":  "Interactive developer experience plan review. (gstack)"
+        "description":  "Interactive developer experience plan review. (gstack)",
+        "path":  "plan-devex-review",
+        "allowedTools":  [
+                             "Read",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "Bash",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "developer experience review",
+                         "dx plan review",
+                         "check developer onboarding"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "plan-eng-review",
-        "description":  "Eng manager-mode plan review. (gstack)"
+        "description":  "Eng manager-mode plan review. (gstack)",
+        "path":  "plan-eng-review",
+        "allowedTools":  [
+                             "Read",
+                             "Write",
+                             "Grep",
+                             "Glob",
+                             "AskUserQuestion",
+                             "Bash",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "review architecture",
+                         "eng plan review",
+                         "check the implementation plan"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "plan-tune",
-        "description":  "Self-tuning question sensitivity + developer psychographic for gstack (v1: observational). (gstack)"
+        "description":  "Self-tuning question sensitivity + developer psychographic for gstack (v1: observational). (gstack)",
+        "path":  "plan-tune",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "AskUserQuestion",
+                             "Glob",
+                             "Grep"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "tune questions",
+                         "stop asking me that",
+                         "too many questions",
+                         "show my profile",
+                         "show my vibe",
+                         "developer profile",
+                         "turn off question tuning"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "qa",
-        "description":  "Systematically QA test a web application and fix bugs found. (gstack)"
+        "description":  "Systematically QA test a web application and fix bugs found. (gstack)",
+        "path":  "qa",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "qa test this",
+                         "find bugs on site",
+                         "test the site"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "qa-only",
-        "description":  "Report-only QA testing. (gstack)"
+        "description":  "Report-only QA testing. (gstack)",
+        "path":  "qa-only",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "qa report only",
+                         "just report bugs",
+                         "test but dont fix"
+                     ]
     },
     {
+        "version":  "2.0.0",
         "name":  "retro",
-        "description":  "Weekly engineering retrospective. (gstack)"
+        "description":  "Weekly engineering retrospective. (gstack)",
+        "path":  "retro",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "weekly retro",
+                         "what did we ship",
+                         "engineering retrospective"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "review",
-        "description":  "Pre-landing PR review. (gstack)"
+        "description":  "Pre-landing PR review. (gstack)",
+        "path":  "review",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Edit",
+                             "Write",
+                             "Grep",
+                             "Glob",
+                             "Agent",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "review this pr",
+                         "code review",
+                         "check my diff",
+                         "pre-landing review"
+                     ]
     },
     {
-        "name":  "scrape",
-        "description":  "Pull data from a web page. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "scrape",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "setup-browser-cookies",
-        "description":  "Import cookies from your real Chromium browser into the headless browse session. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "setup-browser-cookies",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
-        "name":  "setup-deploy",
-        "description":  "Configure deployment settings for /land-and-deploy."
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "setup-deploy",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "setup-gbrain",
-        "description":  "Set up gbrain for this coding agent: install the CLI, initialize a local PGLite or Supabase brain, register MCP, capture per-remote trust policy. (gstack)"
+        "description":  "Set up gbrain for this coding agent: install the CLI, initialize a local PGLite or Supabase brain, register MCP, capture per-remote trust policy. (gstack)",
+        "path":  "setup-gbrain",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "setup gbrain",
+                         "install gbrain",
+                         "connect gbrain",
+                         "start gbrain",
+                         "configure gbrain"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "ship",
-        "description":  "Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. (gstack)"
+        "description":  "Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. (gstack)",
+        "path":  "ship",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Grep",
+                             "Glob",
+                             "Agent",
+                             "AskUserQuestion",
+                             "WebSearch"
+                         ],
+        "preambleTier":  "4",
+        "triggers":  [
+                         "ship it",
+                         "create a pr",
+                         "push to main",
+                         "deploy this"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "skillify",
-        "description":  "Codify the most recent successful /scrape flow into a permanent browser-skill on disk. (gstack)"
+        "description":  "Codify the most recent successful /scrape flow into a permanent browser-skill on disk. (gstack)",
+        "path":  "skillify",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "skillify",
+                         "codify this scrape",
+                         "save this scrape",
+                         "make this permanent"
+                     ]
     },
     {
+        "version":  "0.1.0",
         "name":  "spec",
-        "description":  "Turn vague intent into a precise, executable spec in five phases. (gstack)"
+        "description":  "Turn vague intent into a precise, executable spec in five phases. (gstack)",
+        "path":  "spec",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Grep",
+                             "Glob",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "3",
+        "triggers":  [
+                         "spec this out",
+                         "file an issue",
+                         "write up a ticket",
+                         "turn this into an issue",
+                         "make this a github issue",
+                         "turn this into a backlog item"
+                     ]
     },
     {
+        "version":  "1.0.0",
         "name":  "sync-gbrain",
-        "description":  "Keep gbrain current with this repo\u0027s code and refresh agent search guidance in CLAUDE.md. (gstack)"
+        "description":  "Keep gbrain current with this repo\u0027s code and refresh agent search guidance in CLAUDE.md. (gstack)",
+        "path":  "sync-gbrain",
+        "allowedTools":  [
+                             "Bash",
+                             "Read",
+                             "Write",
+                             "Edit",
+                             "Glob",
+                             "Grep",
+                             "AskUserQuestion"
+                         ],
+        "preambleTier":  "2",
+        "triggers":  [
+                         "sync gbrain",
+                         "refresh gbrain",
+                         "reindex repo",
+                         "update gbrain"
+                     ]
     },
     {
-        "name":  "unfreeze",
-        "description":  "Clear the freeze boundary set by /freeze, allowing edits to all directories again. (gstack)"
+        "version":  null,
+        "name":  null,
+        "description":  null,
+        "path":  "unfreeze",
+        "allowedTools":  [
+
+                         ],
+        "preambleTier":  null,
+        "triggers":  [
+
+                     ]
     }
 ]
